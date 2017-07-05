@@ -1,6 +1,5 @@
 package cn.crap.service.tool;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,9 +106,6 @@ public class AdminPickService implements IPickService{
 			picks.add(pick);
 			pick = new PickDto(ArticleType.PAGE.name(), "站点页面管理");
 			picks.add(pick);
-			pick = new PickDto(DataType.LOG.name(), "操作日志管理");
-			picks.add(pick);
-			
 			return;
 		
 		// 角色
@@ -152,6 +148,7 @@ public class AdminPickService implements IPickService{
 			return;
 		case "MODELNAME":// 数据类型
 			i = 0;
+			@SuppressWarnings("unchecked")
 			List<String> modelNames = (List<String>) articleService.queryByHql("select distinct modelName from Log", null);
 			for (String w : modelNames) {
 				if (w == null)

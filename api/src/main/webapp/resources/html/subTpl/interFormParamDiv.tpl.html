@@ -4,33 +4,41 @@
 		<table class="table table-hover" id="editParamTable">
 			<thead>
 				<tr class="btn-main">
-					<th>名称</th>
-					<th>是否必须</th>
-					<th>位置</th>
-					<th>类型</th>
+					<th class="w10"></th>
+					<th class="w80">父级</th>
+					<th class="w130">名称</th>
+					<th class="w80">是否必须</th>
+					<th class="w120">位置</th>
+					<th class="w120">类型</th>
 					<th>默认值</th>
 					<th>备注</th>
-					<th class="w50">操作</th>
+					<th class="w40">操作</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="item in model.params track by $index">
+					<td style="color: red;" class="p5">{{item.deep}} <input
+					type="hidden" name="deep" value="{{item.deep}}" ng-model="item.deep">
+				</td>
+					<td style="color: red;" class="p5">{{item.parentName}}<input
+					type="hidden" name="parentName" value="{{item.parentName}}" ng-model="item.parentName">
+				</td>
 					<td><input class="form-control" type="text" name="name"
 						value="{{item.name}}" placeholder="参数名：必填"></td>
 					<td class="w100"><select name="necessary" class="form-control">
 							<option value="true" ng-selected="item.necessary=='true'">true</option>
 							<option value="false" ng-selected="item.necessary=='false'">false</option>
 					</select></td>
-					<td class="w100"><select name="inUrl"
-						ng-if="item.inUrl && item.inUrl=='false'" class="form-control">
+					<td class="w100">
+					<select name="inUrl" ng-if="item.inUrl && item.inUrl=='false'" class="form-control">
 							<option value="false" selected="selected">普通参数</option>
 							<option value="true">URL路径</option>
-					</select> <select name="inUrl" ng-if="!item.inUrl || item.inUrl!='false'"
-						class="form-control">
+					</select>
+					 <select name="inUrl" ng-if="!item.inUrl || item.inUrl!='false'" class="form-control">
 							<option value="false">普通参数</option>
 							<option value="true" selected="selected">URL路径</option>
 					</select></td>
-					<td class="w100"><select name="type" class="form-control">
+					<td class="w100"><select name="type" class="form-control b0 no-b-s" ng-model="item.type">
 							<option value="string" ng-selected="item.type=='string'">string</option>
 							<option value="int" ng-selected="item.type=='int'">int</option>
 							<option value="float" ng-selected="item.type=='float'">float</option>
@@ -38,22 +46,36 @@
 							<option value="byte" ng-selected="item.type=='byte'">byte</option>
 							<option value="double" ng-selected="item.type=='double'">double</option>
 							<option value="boolean" ng-selected="item.type=='boolean'">boolean</option>
+							<option value="object" ng-selected="item.type=='object'">object</option>
+							<option value="array" ng-selected="item.type=='array'">array</option>
+							<option value="array[number]" ng-selected="item.type=='array[number]'">array[number]</option>
+							<option value="array[boolean]" ng-selected="item.type=='array[boolean]'">array[boolean]</option>
+							<option value="array[string]" ng-selected="item.type=='array[string]'">array[string]</option>
+							<option value="array[object]" ng-selected="item.type=='array[object]'">array[object]</option>
 							<option value="file" ng-selected="item.type=='file'">file</option>
 					</select></td>
 					<td><input class="form-control" type="text" name="def"
 						value="{{item.def}}" placeholder="默认值"></td>
 					<td><input class="form-control" type="text" name="remark"
 						value="{{item.remark}}"></td>
-					<td class="cursor text-danger"><i class="iconfont"
-						onclick="deleteOneParam(this)">&#xe60e;</i></td>
+					<!-- <td class="cursor text-danger"><i class="iconfont"
+						onclick="deleteOneParam(this)">&#xe60e;</i></td> -->
+		<td class="cursor text-danger p5"><i class="iconfont"
+				ng-click="deleteOneParamByForm($index,item.deep)">&#xe60e;</i> <i
+				class="iconfont"
+				ng-click="addOneParamByParent('params',item.deep,$index)"
+				ng-if="item.type=='object' || item.type=='array[object]' || item.type=='array' ">&#xe604;</i>
+			</td>
 				</tr>
 			</tbody>
 		</table>
 		<button type="button"
 			ng-click="modifyParam('eparam','param',model,'param')"
 			class="btn btn-warning fr ml10">提交修改</button>
-		<button type="button" ng-click="addOneParam('params')"
-			class="btn btn-success fr ml10">添加</button>
+		<!-- <button type="button" ng-click="addOneParam('params')"
+			class="btn btn-success fr ml10">添加</button> -->
+			<button type="button" ng-click="addOneParamByParent('params')"
+		class="btn btn-success fr ml10">添加</button>
 		<button type="button" onclick="changeDisplay('param','eparam')"
 			class="btn btn-primary fr">返回</button>
 	</div>

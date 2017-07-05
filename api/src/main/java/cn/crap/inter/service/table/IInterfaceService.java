@@ -2,11 +2,9 @@ package cn.crap.inter.service.table;
 
 import java.util.List;
 
-import cn.crap.dto.InterfacePDFDto;
 import cn.crap.framework.JsonResult;
 import cn.crap.framework.base.IBaseService;
 import cn.crap.model.Interface;
-import cn.crap.springbeans.Config;
 import cn.crap.utils.Page;
 
 public interface IInterfaceService extends IBaseService<Interface>{
@@ -27,6 +25,4 @@ public interface IInterfaceService extends IBaseService<Interface>{
 	 * @return
 	 */
 	public void getInterFaceRequestExam(Interface interFaceInfo);
-
-	void getInterDto(Config config, List<InterfacePDFDto> interfaces, Interface interFace, InterfacePDFDto interDto);
 }

@@ -1,8 +1,6 @@
 package cn.crap.service.tool;
 
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +54,7 @@ public class UserPickService implements IPickService{
 				switch (code) {
 					case "CATEGORY":
 					int i = 0;
+					@SuppressWarnings("unchecked")
 					List<String> categorys = (List<String>) articleService.queryByHql("select distinct category from Article where moduleId in( select id from Module where userId='" + user.getId()+"')", null);
 					for (String w : categorys) {
 						if (w == null)
@@ -106,22 +105,16 @@ public class UserPickService implements IPickService{
 						return;
 					case "USER":
 						if(key!= null && key.length()>=4){
-							Set<String> userIds = new TreeSet<String>();
-							for (User u : userService.findByMap(Tools.getMap("email|like", key), null, null)) {
-								if( !userIds.contains(u.getId()) ){
+							if(key.indexOf("@")>0){
+								for (User u : userService.findByMap(Tools.getMap("email|like", key), null, null)) {
 									pick = new PickDto(u.getId(), u.getUserName());
 									picks.add(pick);
-									userIds.add(u.getId());
 								}
 							}
-							
-							if(key.indexOf("@")<0){
+							else{
 								for (User u : userService.findByMap(Tools.getMap("userName|like", key), null, null)) {
-									if( !userIds.contains(u.getId()) ){
-										pick = new PickDto(u.getId(), u.getUserName());
-										picks.add(pick);
-										userIds.add(u.getId());
-									}
+									pick = new PickDto(u.getId(), u.getUserName());
+									picks.add(pick);
 								}
 							}
 						}else{

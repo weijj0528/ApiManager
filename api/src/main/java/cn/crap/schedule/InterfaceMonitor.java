@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 import cn.crap.enumeration.MonitorType;
 import cn.crap.inter.service.table.IInterfaceService;
@@ -80,21 +82,28 @@ public class InterfaceMonitor implements Task {
 					myTryTimes ++;
 					try{
 						if(method.contains(",POST,") && !inter.getParam().startsWith("form=")){
-							result = HttpPostGet.postBody(inter.getFullUrl(), inter.getParam(), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.postBody(inter.getFullUrl(), inter.getParam(), getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",POST,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)),
+									getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",GET,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)),
+									getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",PUT,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), 
+									getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",DELETE,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), 
+									getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",HEAD,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), 
+									getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",OPTIONS,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), 
+									getMapFromStr(inter.getHeader()),null);
 						}else if(method.contains(",TRACE,")){
-							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), getMapFromStr(inter.getHeader()));
+							result = HttpPostGet.post(inter.getFullUrl(), getMapFromStr(inter.getParam().substring(5)), 
+									getMapFromStr(inter.getHeader()),null);
 						}
 					}catch(Exception e){
 						// 网络异常
@@ -157,9 +166,9 @@ public class InterfaceMonitor implements Task {
     	exec.execute(task);
     }
     
-    private Map<String, String> getMapFromStr(String str){
-    	JSONArray jsonStr = JSONArray.parseArray(str);
-    	Map<String, String> map = new HashMap<String, String>();
+    private Map<String, Object> getMapFromStr(String str){
+    	JSONArray jsonStr = JSONArray.fromObject(str);
+    	Map<String, Object> map = new HashMap<String, Object>();
     	for(int i=0; i< jsonStr.size(); i++){
     		JSONObject json = jsonStr.getJSONObject(i);
     		map.put(json.getString("name"), json.getString("def"));

@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.crap.dto.ErrorDto;
-import cn.crap.dto.InterfacePDFDto;
-import cn.crap.dto.ParamDto;
-import cn.crap.dto.ResponseParamDto;
 import cn.crap.framework.JsonResult;
 import cn.crap.framework.base.BaseService;
 import cn.crap.framework.base.IBaseDao;
@@ -23,12 +23,9 @@ import cn.crap.inter.service.tool.ICacheService;
 import cn.crap.inter.service.tool.ILuceneService;
 import cn.crap.model.Interface;
 import cn.crap.model.Module;
-import cn.crap.springbeans.Config;
 import cn.crap.utils.MyString;
 import cn.crap.utils.Page;
 import cn.crap.utils.Tools;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @Service
 public class InterfaceService extends BaseService<Interface>
@@ -36,7 +33,7 @@ public class InterfaceService extends BaseService<Interface>
 	@Autowired
 	private ICacheService cacheService;
 	@Autowired
-	private IModuleService moduleService;
+	private IModuleService dataCenterService;
 	@Resource(name="interfaceDao")
 	IInterfaceDao interfaceDao;
 	
@@ -45,24 +42,6 @@ public class InterfaceService extends BaseService<Interface>
 		super.setDao(dao);
 	}
 
-	@Override
-	public void getInterDto(Config config, List<InterfacePDFDto> interfaces, Interface interFace, InterfacePDFDto interDto) {
-		interDto.setModel(interFace);
-		if(interFace.getParam().startsWith("form=")){
-			interDto.setFormParams(JSONArray.toArray(JSONArray.fromObject(interFace.getParam().substring(5)),ParamDto.class));
-		}else{
-			interDto.setCustomParams( interFace.getParam());
-		}
-		interDto.setTrueMockUrl(config.getDomain()+"/mock/trueExam.do?id="+interFace.getId());
-		interDto.setFalseMockUrl(config.getDomain()+"/mock/falseExam.do?id="+interFace.getId());
-
-		interDto.setHeaders( JSONArray.toArray(JSONArray.fromObject(interFace.getHeader()),ParamDto.class));
-		interDto.setResponseParam( JSONArray.toArray(JSONArray.fromObject(interFace.getResponseParam()),ResponseParamDto.class) );
-		interDto.setParamRemarks( JSONArray.toArray(JSONArray.fromObject(interFace.getParamRemark()), ResponseParamDto.class) );
-		interDto.setErrors( JSONArray.toArray(JSONArray.fromObject(interFace.getErrors()),ErrorDto.class) );
-		interfaces.add(interDto);
-	}
-	
 	@Override
 	@Transactional
 	public Interface get(String id){
@@ -96,7 +75,7 @@ public class InterfaceService extends BaseService<Interface>
 				params.put("id|in", moduleIds);
 			}
 			params.put("id|!=", "top");// 顶级目录不显示
-			modules = moduleService.findByMap(params, null, null);
+			modules = dataCenterService.findByMap(params, null, null);
 		}
 		params.clear();
 		params.put("interfaces", interfaces);
@@ -145,10 +124,5 @@ public class InterfaceService extends BaseService<Interface>
 	@Transactional
 	public List<Interface> getAll() {
 		return interfaceDao.findByMap(null, null, null);
-	}
-
-	@Override
-	public String getLuceneType() {
-		return "接口";
 	}
 }

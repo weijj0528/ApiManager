@@ -2,10 +2,10 @@ package cn.crap.service.thirdly;
 
 import java.util.Map;
 
+import net.sf.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.alibaba.fastjson.JSON;
 
 import cn.crap.dto.thirdly.GitHubAccessToken;
 import cn.crap.dto.thirdly.GitHubUser;
@@ -21,11 +21,11 @@ public class GitHubService {
 	
 	   public GitHubAccessToken getAccessToken(String code,String redirect_uri) throws Exception{
 	        String url ="https://github.com/login/oauth/access_token";
-	        Map<String,String> params = Tools.getStrMap("client_id",config.getClientID(),
+	        Map<String,Object> params = Tools.getStrMap("client_id",config.getClientID(),
 	        		"client_secret",config.getClientSecret(),"code",code,"redirect_uri",redirect_uri);
 	        
-	        String rs = HttpPostGet.post(url, params, Tools.getStrMap("Accept","application/json"));
-	        GitHubAccessToken accessToken = JSON.parseObject(rs,GitHubAccessToken.class);
+	        String rs = HttpPostGet.post(url, params, Tools.getStrMap("Accept","application/json"),null);
+	        GitHubAccessToken accessToken = (GitHubAccessToken) JSONObject.toBean(JSONObject.fromObject(rs),GitHubAccessToken.class);
 	        if(accessToken == null || accessToken.getAccess_token() == null)
 	            throw new MyException("000026");
 	        return accessToken;
@@ -36,7 +36,7 @@ public class GitHubService {
 	        String rs = HttpPostGet.get(url, null, null);
 	        if(rs.contains("message"))
 	        	throw new MyException("000026",rs);
-	        return JSON.parseObject(rs,GitHubUser.class);
+	        return (GitHubUser) JSONObject.toBean(JSONObject.fromObject(rs),GitHubUser.class);
 	    }
 
 }

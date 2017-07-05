@@ -99,7 +99,7 @@ public class ArticleController extends BaseController<Article>{
 			}	
 			
 			hasPermission( cacheService.getProject(article.getProjectId()) , article.getType().equals(ArticleType.ARTICLE.name())? modArticle:modDict);
-			articleService.update(article, ArticleType.getByEnumName(article.getType()), "");
+			articleService.update(article);
 			luceneService.update(article.toSearchDto(cacheService));
 		}else{
 			hasPermission( cacheService.getProject(article.getProjectId()) , article.getType().equals(ArticleType.ARTICLE.name())? addArticle:addDict);
@@ -113,33 +113,21 @@ public class ArticleController extends BaseController<Article>{
 	
 	@RequestMapping("/delete.do")
 	@ResponseBody
-	public JsonResult delete(String id, String ids) throws MyException, IOException{
-		if( MyString.isEmpty(id) && MyString.isEmpty(ids)){
-			throw new MyException("000029");
-		}
-		if( MyString.isEmpty(ids) ){
-			ids = id;
+	public JsonResult delete(@ModelAttribute Article article) throws MyException, IOException{
+		Article model = articleService.get(article.getId());
+		hasPermission( cacheService.getProject(model.getProjectId()) , model.getType().equals(ArticleType.ARTICLE.name())? delArticle:delDict);
+		if(model.getCanDelete()!=1){
+			throw new MyException("000009");
 		}
 		
-		for(String tempId : ids.split(",")){
-			if(MyString.isEmpty(tempId)){
-				continue;
-			}
-			Article model = articleService.get(tempId);
-			hasPermission( cacheService.getProject(model.getProjectId()) , model.getType().equals(ArticleType.ARTICLE.name())? delArticle:delDict);
-			if(model.getCanDelete()!=1){
-				throw new MyException("000009");
-			}
-			
-			if( commentService.getCount(Tools.getMap("articleId", model.getId()))>0){
-				throw new MyException("000037");
-			}
-			articleService.delete(model, ArticleType.getByEnumName(model.getType()) , "");
-			cacheService.delObj(Const.CACHE_WEBPAGE + model.getId());
-			cacheService.delObj(Const.CACHE_WEBPAGE + model.getKey());
-			
-			luceneService.delete(new SearchDto(model.getId()));
+		if( commentService.getCount(Tools.getMap("articleId", model.getId()))>0){
+			throw new MyException("000037");
 		}
+		articleService.delete(article);
+		cacheService.delObj(Const.CACHE_WEBPAGE + article.getId());
+		cacheService.delObj(Const.CACHE_WEBPAGE + article.getKey());
+		
+		luceneService.delete(new SearchDto(article.getId()));
 		return new JsonResult(1,null);
 	}
 	

@@ -58,8 +58,10 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         	String uid = MyCookie.getCookie(Const.COOKIE_USERID, false, request);
             // 前端没有传递token，未登录
             if(MyString.isEmpty(token) || MyString.isEmpty(uid) || !Aes.desEncrypt(token).equals(uid)){
-            	if(request.getRequestURI().endsWith("admin.do"))
+            	if(request.getRequestURI().endsWith("admin.do")){
             		response.sendRedirect("loginOrRegister.do#/login");
+            		return false;
+            	}
             	else
             		throw new MyException("000021");
             }

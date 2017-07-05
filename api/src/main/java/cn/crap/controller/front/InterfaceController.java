@@ -12,12 +12,16 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import cn.crap.dto.ErrorDto;
 import cn.crap.dto.InterfacePDFDto;
 import cn.crap.dto.ParamDto;
@@ -38,8 +42,6 @@ import cn.crap.utils.HttpPostGet;
 import cn.crap.utils.MyString;
 import cn.crap.utils.Page;
 import cn.crap.utils.Tools;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @Controller("frontInterfaceController")
 @RequestMapping("/front/interface")
@@ -79,7 +81,7 @@ public class InterfaceController extends BaseController<Interface>{
 					request.setAttribute("result", "接口id有误，生成PDF失败。请确认配置文件config.properties中的网站域名配置是否正确！");
 					return "/WEB-INF/views/result.jsp";
 				}
-				interfaceService.getInterDto(config, interfaces, interFace, interDto);
+				getInterDto(interfaces, interFace, interDto);
 			}else{
 				module = moduleService.get(moduleId);
 				if(MyString.isEmpty(module.getId())){
@@ -88,7 +90,7 @@ public class InterfaceController extends BaseController<Interface>{
 				}
 				for( Interface inter : interfaceService.findByMap(Tools.getMap("moduleId", moduleId), null, null)){
 					interDto= new InterfacePDFDto();
-					interfaceService.getInterDto(config, interfaces, inter, interDto);
+					getInterDto(interfaces, inter, interDto);
 	
 				}
 			}
@@ -104,6 +106,23 @@ public class InterfaceController extends BaseController<Interface>{
 		}
 	}
 
+	private void getInterDto(List<InterfacePDFDto> interfaces, Interface interFace, InterfacePDFDto interDto) {
+		interDto.setModel(interFace);
+		if(interFace.getParam().startsWith("form=")){
+			interDto.setFormParams(JSONArray.toArray(JSONArray.fromObject(interFace.getParam().substring(5)),ParamDto.class));
+		}else{
+			interDto.setCustomParams( interFace.getParam());
+		}
+		interDto.setTrueMockUrl(config.getDomain()+"/mock/trueExam.do?id="+interFace.getId());
+		interDto.setFalseMockUrl(config.getDomain()+"/mock/falseExam.do?id="+interFace.getId());
+
+		interDto.setHeaders( JSONArray.toArray(JSONArray.fromObject(interFace.getHeader()),ParamDto.class));
+		interDto.setResponseParam( JSONArray.toArray(JSONArray.fromObject(interFace.getResponseParam()),ResponseParamDto.class) );
+		interDto.setParamRemarks( JSONArray.toArray(JSONArray.fromObject(interFace.getParamRemark()), ResponseParamDto.class) );
+		interDto.setErrors( JSONArray.toArray(JSONArray.fromObject(interFace.getErrors()),ErrorDto.class) );
+		interfaces.add(interDto);
+	}
+	
 	@RequestMapping("/download/pdf.do")
 	@ResponseBody
 	public void download(String id,String moduleId,HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -193,7 +212,7 @@ public class InterfaceController extends BaseController<Interface>{
 					Tools.getMap("versions", versions, 
 							"crumbs", 
 							Tools.getCrumbs( 
-									project.getName(), "#/"+project.getId()+"/module/list",
+									project.getName(), "#/"+project.getId()+"module/list",
 									module.getName()+":接口列表", "#/"+project.getId()+"/interface/list/" + module.getId(),
 									interFace.getInterfaceName() , "void"), "module",cacheService.getModule(interFace.getModuleId()) ));
 		}else{
@@ -203,25 +222,29 @@ public class InterfaceController extends BaseController<Interface>{
 	
 	@RequestMapping("/debug.do")
 	@ResponseBody
-	public JsonResult debug(@RequestParam String params, @RequestParam String headers, @RequestParam(defaultValue="") String customParams,
+	public JsonResult debug(@RequestParam String params, @RequestParam String headers,@RequestParam String debugIsLogin,
+			@RequestParam(defaultValue="") String customParams,
 			@RequestParam String debugMethod,@RequestParam String fullUrl) throws Exception {
-		
 		JSONArray jsonParams = JSONArray.fromObject(params);
 		JSONArray jsonHeaders = JSONArray.fromObject(headers);
-		Map<String,String> httpParams = new HashMap<String,String>();
+		Map<String,Object> httpParams = new HashMap<String,Object>();
 		for(int i=0;i<jsonParams.size();i++){
 			JSONObject param = jsonParams.getJSONObject(i);
 			for(Object paramKey:param.keySet()){
-				if(fullUrl.contains("{"+paramKey.toString()+"}")){
-					fullUrl = fullUrl.replace("{"+paramKey.toString()+"}", param.getString(paramKey.toString()));
+				String key = paramKey.toString();
+				String values = param.getString(key);
+				if(fullUrl.contains("{"+key+"}")){
+					fullUrl = fullUrl.replace("{"+key+"}",values );
 				}else{
-					httpParams.put(paramKey.toString(), param.getString(paramKey.toString()));
+					if(key.equals("[type]") || key.equals("[deep]") || key.equals("[parentName]")){
+						httpParams.put(key.replace("[", "").replace("]", ""),values);
+					}else
+						httpParams.put(key,values);
 				}
-				
 			}
 		}
 		
-		Map<String,String> httpHeaders = new HashMap<String,String>();
+		Map<String,Object> httpHeaders = new HashMap<String,Object>();
 		for(int i=0;i<jsonHeaders.size();i++){
 			JSONObject param = jsonHeaders.getJSONObject(i);
 			for(Object paramKey:param.keySet()){
@@ -230,13 +253,13 @@ public class InterfaceController extends BaseController<Interface>{
 		}
 		// 如果自定义参数不为空，则表示需要使用post发送自定义包体
 		if(!MyString.isEmpty(customParams)){
-			return new JsonResult(1, Tools.getMap("debugResult",HttpPostGet.postBody(fullUrl, customParams, httpHeaders)));
+			return new JsonResult(1, Tools.getMap("debugResult",HttpPostGet.postBody(fullUrl, customParams, httpHeaders,debugIsLogin)));
 		}
 		
 		try{
 			switch(debugMethod){
 			case "POST":
-				return new JsonResult(1, Tools.getMap("debugResult",HttpPostGet.post(fullUrl, httpParams, httpHeaders)));
+				return new JsonResult(1, Tools.getMap("debugResult",HttpPostGet.post(fullUrl, httpParams, httpHeaders,debugIsLogin)));
 			case "GET":
 				return new JsonResult(1, Tools.getMap("debugResult",HttpPostGet.get(fullUrl, httpParams, httpHeaders)));
 			case "PUT":

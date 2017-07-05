@@ -264,12 +264,6 @@ function closeTip(data,iLoading,tipTime){
 		}
 	}
 	if(iLoading.toUpperCase().indexOf('TIP') >= 0){
-		// 需要先赋值才能获取浏览宽度
-		if(tipMessage!=""){
-			if(tipMessage!="false"&&tipMessage!=false)
-				$("#tip-div").html(tipMessage);
-		}
-		$("#tip-div").css("left",  ($(window).width()/2 - $("#tip-div").width()/2) +"px");
 		showMessage("tip-div",tipMessage,false,tipTime);
 	}
 }
@@ -383,7 +377,7 @@ function iShow(id){
 }
 
 /**
- * 全选、全不选
+ * 全选、全部选
  * 
  * @param id
  *            点击多选框

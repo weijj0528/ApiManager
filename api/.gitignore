@@ -1,2 +1,9 @@
-.idea/*
+/target
+/lib
+/logs
 *.iml
+.idea
+.settings
+.externalToolBuilders
+.checkstyle
+.classpath

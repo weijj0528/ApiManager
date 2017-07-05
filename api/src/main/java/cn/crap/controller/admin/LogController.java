@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import cn.crap.framework.JsonResult;
-import cn.crap.framework.MyException;
 import cn.crap.framework.auth.AuthPassport;
 import cn.crap.framework.base.BaseController;
 import cn.crap.inter.service.table.ILogService;
@@ -32,7 +31,7 @@ public class LogController extends BaseController<Log>{
 	public JsonResult list(@ModelAttribute Log log,@RequestParam(defaultValue="1") Integer currentPage){
 		Page page= new Page(15);
 		page.setCurrentPage(currentPage);
-		Map<String,Object> map = Tools.getMap("modelName",log.getModelName(),"identy", log.getIdenty());
+		Map<String,Object> map = Tools.getMap("modelName",log.getModelName());
 		return new JsonResult(1,logService.findByMap(map,page,null),page);
 	}
 	
@@ -50,11 +49,16 @@ public class LogController extends BaseController<Log>{
 	}
 	
 		
-	@RequestMapping("/recover.do")
+	@RequestMapping("/delete.do")
 	@ResponseBody
 	@AuthPassport(authority=Const.AUTH_LOG)
-	public JsonResult recover(@ModelAttribute Log log) throws MyException{
-		logService.recover(log);
+	public JsonResult delete(@ModelAttribute Log log, @RequestParam(defaultValue="false") boolean recover){
+		// 恢复数据
+		if(recover){
+			logService.recover(log);
+		}else{
+			logService.delete(log);// 删除日志
+		}
 		return new JsonResult(1,null);
 	}
 }

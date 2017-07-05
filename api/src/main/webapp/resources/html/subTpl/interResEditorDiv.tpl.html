@@ -4,7 +4,8 @@
 		<thead>
 			<tr class="btn-main">
 				<th class="w50"></th>
-				<th>名称</th>
+				<th class="w80">父级</th>
+				<th class="w130">名称</th>
 				<th class="w100">类型</th>
 				<th class="w100">是否必须</th>
 				<th class="w200">备注</th>
@@ -15,6 +16,9 @@
 			<td style="color: red;" class="p5">{{item.deep}} <input
 				type="hidden" name="deep" value="{{item.deep}}" ng-model="item.deep">
 			</td>
+				<td style="color: red;" class="p5">{{item.parentName}}<input
+					type="hidden" name="parentName" value="{{item.parentName}}" ng-model="item.parentName">
+				</td>
 			<td class="p5"><input class="form-control b0 no-b-s"
 				style="padding-left: {{item.deep*10+ 'px'}}" type="text" name="name"
 				ng-model="item.name" value="{{item.name}}" placeholder="参数名：必填">
@@ -22,18 +26,18 @@
 			<td class="w120 p5"><select name="type"
 				class="form-control b0 no-b-s" ng-model="item.type">
 					<option value="string" ng-selected="item.type=='string'">string</option>
-					<option value="number" ng-selected="item.type=='number'">number</option>
+					<option value="int" ng-selected="item.type=='int'">int</option>
+					<option value="float" ng-selected="item.type=='float'">float</option>
+					<option value="long" ng-selected="item.type=='long'">long</option>
+					<option value="byte" ng-selected="item.type=='byte'">byte</option>
+					<option value="double" ng-selected="item.type=='double'">double</option>
 					<option value="boolean" ng-selected="item.type=='boolean'">boolean</option>
 					<option value="object" ng-selected="item.type=='object'">object</option>
 					<option value="array" ng-selected="item.type=='array'">array</option>
-					<option value="array[number]"
-						ng-selected="item.type=='array[number]'">array[number]</option>
-					<option value="array[boolean]"
-						ng-selected="item.type=='array[boolean]'">array[boolean]</option>
-					<option value="array[string]"
-						ng-selected="item.type=='array[string]'">array[string]</option>
-					<option value="array[object]"
-						ng-selected="item.type=='array[object]'">array[object]</option>
+					<option value="array[number]" ng-selected="item.type=='array[number]'">array[number]</option>
+					<option value="array[boolean]" ng-selected="item.type=='array[boolean]'">array[boolean]</option>
+					<option value="array[string]" ng-selected="item.type=='array[string]'">array[string]</option>
+					<option value="array[object]" ng-selected="item.type=='array[object]'">array[object]</option>
 					<option value="file" ng-selected="item.type=='file'">file</option>
 			</select></td>
 			<td class="p5"><select name="necessary"
@@ -45,7 +49,7 @@
 				name="remark" ng-model="item.remark" value="{{item.remark}}"
 				placeholder="备注"></td>
 			<td class="cursor text-danger p5"><i class="iconfont"
-				ng-click="deleteOneParamByParent('responseParams',$index,item.deep)">&#xe60e;</i> <i
+				ng-click="deleteOneParamByParent($index,item.deep)">&#xe60e;</i> <i
 				class="iconfont"
 				ng-click="addOneParamByParent('responseParams',item.deep,$index)"
 				ng-if="item.type=='object' || item.type=='array[object]' || item.type=='array' ">&#xe604;</i>

@@ -12,34 +12,24 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <body class="BG_COLOR">
 	<!-- top navbar -->
 	<%@ include  file="topNav.jsp"%>
+	<!-- Top Search-->
+	<%@ include  file="topSearch.jsp"%>
 	
 	<div class="container p0 mt20">
 		<div class="row min-h p0 m0">
 			<!-- leftMenu -->
 			<%@ include  file="left.jsp"%>
-			<div class="col-xs-12 col-md-9 p0 BG_COLOR m0 pt0">
+			<div class="col-xs-9 p0 BG_COLOR m0 pt0">
 				<div class="BGFFF min-h500 p20">
-					<div class="col-xs-12 f16 fb pl10 mb10 adorn-bl-3" id="interface-content">
-						接口列表
-					</div>
+					<div class="col-xs-12 p3 pl10 mr10 f14 fb mb20 adorn-bl-3">文章列表</div>
 					<div class="cb"></div>
-					<c:if test="${interfaceList.size() == 0}">
-						<div class="col-xs-12 tc mt10 mb10 C999">
-									<i class="iconfont f20 mt-5 mr10">&#xe626;</i>该模块下没有接口
-						</div>
-					</c:if>
-					
-						
-					<c:forEach var="f" items="${interfaceList}" varStatus="status">
+					<c:forEach var="f" items="${articleList}" varStatus="status">
 						<div class="dashed-t">
-							<a href="${f.id}.html" class="p10 pl0 f16 fb dis w C000 no_unl">${f.interfaceName}</a>
-							<div class ="f14 C555">${f.remarkNoHtml}</div>
+							<a href="${f.id}.html" class="p10 pl0 f16 fb dis w C000 no_unl">${f.name}</a>
+							<div class ="f14 C555">${f.brief}</div>
 							<div class="tr C999 f12 p10"><span class="C999 pl20">${f.createTime}</span></div>
 						</div>
 					</c:forEach>
-					
-					<%@ include file="page.jsp"%>
-				
 				</div>
 			</div>
 			
@@ -48,10 +38,5 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 	<!-- footer -->
 	<%@ include  file="footer.jsp"%>
-	<script type="text/javascript">
-		if($(window).width() < 1000){
-			scrollToId('interface-content');
-		}
-	</script>
 </body>
 </html>

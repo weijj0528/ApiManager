@@ -256,7 +256,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
 			}
 		}
 	}).state('logList', {
-		url : '/log/list/:identy',
+		url : '/log/list',
 		views : {
 			'main' : {
 				templateUrl : 'resources/html/backHtml/logList.tpl.html'

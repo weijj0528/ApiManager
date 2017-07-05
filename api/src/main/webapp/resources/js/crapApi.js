@@ -1,7 +1,7 @@
 /****************密码访问*****************/
 function propUpPsswordDiv(obj){
 	var msg = obj.textContent;
-	if(msg.indexOf("[000007]")>=0 || msg.indexOf("[000011]")>=0){
+	if(msg.indexOf("[000007]")>=0){
 		lookUp('passwordDiv', '', 300, 300 ,6,'');
 		showMessage('passwordDiv','false',false,-1);
 		showMessage('fade','false',false,-1);
@@ -36,6 +36,7 @@ function addOneField(name, type, notNull,flag, def, remark, rowNum) {
 function deleteOneParam(nowTr) {
 	$(nowTr).parent().parent().remove();
 }
+
 
 function upward(nowTr){
 	var $tr = $(nowTr).parent().parent(); 
@@ -74,7 +75,10 @@ function getParamFromTable(tableId) {
 				j = j + 1;
 				if (j != 1)
 					json += ",";
-				json += "\"" + val.name + "\":\"" + replaceAll(val.value,'"','\\"') + "\""
+				if(tableId == 'debugParams' && ( val.name == 'type' || val.name == 'deep' || val.name == 'parentName' ) && val.type != 'hidden'){
+					json += "\"["+ val.name +"]\":\"" + replaceAll(val.value,'"','\\"') + "\""
+				}else				
+					json += "\"" + val.name + "\":\"" + replaceAll(val.value,'"','\\"') + "\""
 		});
 		$(this).find('td').find('select').each(function(i, val) {
 			j = j + 1;
@@ -253,19 +257,4 @@ function saveMarkdown(markdown,content){
 	    rootScope.model[content] = $(window.frames["markdownFrame"].document).find('#preview').html();
 	});
 	closeMyDialog('markdownDialog');
-}
-// 重建索引
-function rebuildIndex(obj){
-	if (confirm("确定重建索引？")) {
-		selectButton(obj,'menu-a');
-		callAjaxByName('iUrl=back/rebuildIndex.do|iLoading=PROPUPFLOAT重建索引中，刷新页面可以查看实时进度...|ishowMethod=updateDivWithImg');
-	}
-}
-
-//刷新缓存
-function flushDB(obj){
-	if (confirm("确定刷新缓存？登陆信息等缓存将被删除")) {
-		selectButton(obj,'menu-a');
-		callAjaxByName('iUrl=back/flushDB.do|iLoading=TIPFLOAT刷新中，请稍后...|ishowMethod=updateDivWithImg');
-	}
 }

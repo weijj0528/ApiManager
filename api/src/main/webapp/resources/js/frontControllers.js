@@ -101,7 +101,7 @@ mainModule.controller('errorCtrl', function($rootScope,$scope, $http, $state, $s
 		if(setPwd) setPassword();
 		var params ="&password="+unescapeAndDecode('password');
 		params +="&visitCode="+unescapeAndDecode('visitCode');
-		params = "iUrl=front/error/list.do|iLoading=FLOAT|iPost=true|iParams=&projectId=" +
+		params = "iUrl=front/error/list.do|iLoading=FLOAT|iParams=&projectId=" +
 			$stateParams.projectId +"&errorMsg=" + $stateParams.errorMsg+"&errorCode=" + $stateParams.errorCode + params;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
@@ -169,7 +169,7 @@ webModule.controller('articleDetailCtrl', function($rootScope,$scope, $http, $st
  */
 webModule.controller('frontProjectCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page,setPwd) {
-		var params = "iUrl=front/project/list.do|iLoading=FLOAT|iPost=true|iParams=&myself="+$stateParams.myself+"&name="+$stateParams.name;
+		var params = "iUrl=front/project/list.do|iLoading=FLOAT|iParams=&myself="+$stateParams.myself+"&name="+$stateParams.name;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -239,7 +239,7 @@ webModule.controller('frontInterfaceCtrl', function($rootScope,$scope, $http, $s
 		if(setPwd) setPassword();
 		params +="&password="+unescapeAndDecode('password');
 		params +="&visitCode="+unescapeAndDecode('visitCode');
-		params = "iUrl=front/interface/list.do|iLoading=FLOAT|iPost=true|iParams="+params;
+		params = "iUrl=front/interface/list.do|iLoading=FLOAT|iParams="+params;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -251,6 +251,9 @@ webModule.controller('frontInterfaceCtrl', function($rootScope,$scope, $http, $s
  * 不需要打开模态框，所以不能调用$rootScope中的getBaseData()
  */
 webModule.controller('interfaceDetailCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
+	$scope.showInfo = function(){
+		alert("Copy 成功");
+	}
 	$scope.getData = function(page,setPwd) {
 		//setPwd不为空，表示用户输入了密码，需要记录至cookie中
 		if(setPwd) setPassword();
@@ -273,7 +276,6 @@ webModule.controller('interfaceDetailCtrl', function($rootScope,$scope, $http, $
 					 $rootScope.formParams = eval("("+result.data.param.substring(5)+")");
 				 }else{
 					 $rootScope.model.customParams = result.data.param;
-					 $rootScope.formParams = null;
 				 }
 				 
 				 $rootScope.headers = eval("("+result.data.header+")");
@@ -288,7 +290,11 @@ webModule.controller('interfaceDetailCtrl', function($rootScope,$scope, $http, $
     };
     $scope.getDebugResult= function() {
     	$rootScope.model.headers = getParamFromTable("debugHeader");
-		$rootScope.model.params =getParamFromTable("debugParams");
+		$rootScope.model.params = getParamFromTable("debugParams");
+		$rootScope.model.debugIsLogin = getParamFromTable("debugIsLogin");
+		
+		$rootScope.model.params = arrange($rootScope.model.params);
+		
     	var params = "iUrl=front/interface/debug.do|iLoading=FLOAT|iPost=POST|iParams=&"+$.param($rootScope.model);
 		httpService.callHttpMethod($http,params).success(function(result) {
 			var isSuccess = httpSuccess(result,'iLoading=FLOAT');
@@ -366,7 +372,60 @@ webModule.controller('fontInit', function($rootScope,$scope, $http, $state, $sta
     $scope.getData();
 });
 
-
-
-
+function arrange(arr) {
+  if (typeof (arr) == 'string') {
+    arr = eval("(" + arr + ")");
+  }
+  var deep = 0;
+  var arrangeArr = [];
+  for (var i in arr) {
+    if (parseInt(arr[i].deep) > deep) {
+      deep = parseInt(arr[i].deep);
+    }
+  }
+  for (var i = 0; i < deep + 1; i++) {
+    for (var m in arr) {
+      var key = '';
+      for (var n in arr[m]) {
+        if (n != 'deep' && n != 'parentName' && n != 'type') {
+          key = n;
+        }
+      }
+      if (parseInt(arr[m].deep) == i) {
+        var item = {};
+        if (arr[m].type == 'object') {
+          item[key] = {};
+        } else if (arr[m].type == 'array[object]') {
+          item[key] = [{}];
+        } else if (arr[m].type == 'array') {
+          item[key] = [];
+        } else {
+          item[key] = arr[m][key];
+        }
+        if (i == 0) {
+          arrangeArr.push(item);
+        } else {
+          (function () {
+            var k = arguments[0];
+            for (var j in k) {
+              if (j == arr[m].parentName) {
+                if (k[j].constructor == Array&&k[j][0].constructor==Object) {
+                  k[j][0][key] = item[key];
+                } else if(k[j].constructor == Array){
+                  k[j].push(item);
+                }else{
+                  k[j][key] = item[key];  
+                }
+                break;
+              } else if (typeof (k[j]) == 'array' || typeof (k[j]) == 'object') {
+                arguments.callee(k[j]);
+              }
+            }
+          })(arrangeArr);
+        }
+      }
+    }
+  }
+  return JSON.stringify(arrangeArr);
+}
 

@@ -40,9 +40,4 @@ public class SourceService extends BaseService<Source>
 	public List<Source> getAll() {
 		return sourceDao.findByMap(null, null, null);
 	}
-
-	@Override
-	public String getLuceneType() {
-		return "资源";
-	}
 }

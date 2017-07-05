@@ -50,6 +50,7 @@ public class GitHubController extends BaseController<User> {
 		String state = Tools.getChar(20);
 		cacheService.setStr( MyCookie.getCookie(Const.COOKIE_TOKEN, false, request) + Const.CACHE_AUTHORIZE, state, 10*60);
 		response.sendRedirect(String.format(authorizeUrl, config.getClientID(), state));
+		return;
 	}
 	@RequestMapping("/github/login.do")
 	public String login(@RequestParam String code,@RequestParam String state) throws Exception {
@@ -84,7 +85,7 @@ public class GitHubController extends BaseController<User> {
 			userService.login(model, user, request, response);
 			
 			response.sendRedirect("../admin.do");
+			return null;
 		}
-		return "";
 	}
 }

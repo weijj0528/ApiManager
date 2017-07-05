@@ -34,10 +34,6 @@
 		ng-click="detail('新增接口',1100,'user/interface/detail.do?id=NULL','&moduleId='+$stateParams.moduleId)"> 
 		<i class="iconfont fb">&#xe604;</i>&nbsp;新增接口 
 	</a>
-	<a type="button" class="btn btn-danger btn-sm cursor" ng-if="showOperation('PROJECT',$stateParams.projectId)"
-		ng-click="del('user/interface/delete.do?ids='+deleteIds,'','确认批量删除选中的接口？')"> 
-		<i class="iconfont fb">&#xe60e;</i>&nbsp;批量删除
-	</a>
 </div>
 <div class="col-xs-3 f16 fb pl0 mb10 pb5 mt20">接口列表</div>
 <div class="f12 tr C999 col-xs-9 mt20">
@@ -47,19 +43,17 @@
 	<table class="table table-bordered table-hover">
 		<thead>
 			<tr class="BGEEE">
-				<th class="w60"><input type="checkbox" id="select-all" ng-click="selectAll('select-all','deleteIds',list)">&nbsp;全选</th>
-				<th class="tc w100">名称</th>
-				<th class="tc">版本号</th>
-				<th class="tc w100">模块名</th>
-				<th class="tc">排序</th>
-				<th class="tc w200">最后修改人</th>
-				<th class="tc">最后修改时间</th>
-				<th class="w500 tc">操作</th>
+				<th class="tc ">名称</th>
+				<th class="tc w100">版本号</th>
+				<th class="tc ">模块名</th>
+				<th class="tc w50">排序</th>
+				<th class="tc w300">最后修改人</th>
+				<th class="tc w150">最后修改时间</th>
+				<th class="w400 tc">操作</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="item in list">
-				<td><input type="checkbox" name="deleteIds" ng-click="checkboxSelect('deleteIds',item.id)"></td>
 				<td class="tc">{{item.interfaceName}}</td>
 				<td class="tc">{{item.version}}</td>
 				<td class="tc">{{item.moduleName}}</td>
@@ -68,7 +62,7 @@
 				<td class="tc">{{getDate(item.updateTime)|date:'yyyy-MM-dd HH:mm'}}</td>
 				<td class="tc">
 				<a class="f12 text-primary mr10 cursor" ng-if="showOperation('PROJECT',$stateParams.projectId)"
-					ng-click="detail('编辑【'+item.interfaceName+'】',1100,'user/interface/detail.do?id='+item.id,'',initEditInterFace)"> 
+					ng-click="detail('编辑【'+item.interfaceName+'】',1550,'user/interface/detail.do?id='+item.id,'',initEditInterFace)"> 
 					<i class="iconfont f12">&#xe618;修改</i>
 				</a>
 				<a class="f12 text-primary mr10 cursor" ng-if="showOperation('PROJECT',$stateParams.projectId)"
@@ -85,9 +79,6 @@
 					ng-click="sendRequest('user/module/setTemplate.do?id='+item.id)">
 					<i class="iconfont f12"  ng-if="item.template">&#xe63d;取消模板</i>
 					<i class="iconfont f12 text-success"  ng-if="!item.template">&#xe63d;设置模板</i>
-				</a>
-				<a class="f12 text-primary mr10 cursor" ng-if="showOperation('LOG','');"  ng-href="admin.do#/log/list/{{item.id}}">
-					<i class="iconfont">&#xe62b;&nbsp;</i>操作日志
 				</a>
 				
 				<a class="f12 text-danger mr10 cursor" title="删除"  ng-if="showOperation('PROJECT',$stateParams.projectId)"

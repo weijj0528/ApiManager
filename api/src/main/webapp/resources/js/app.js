@@ -1,4 +1,10 @@
-var app = angular.module('app', [ 'ui.router', 'mainModule','webModule','interfaceMethods','textAngular']);
+var app = angular.module('app', [ 'ui.router', 'mainModule','webModule','interfaceMethods','textAngular','ngClipboard']);
+
+app.config(['ngClipProvider', function(ngClipProvider) {
+    ngClipProvider.setPath("resources/js/ZeroClipboard.swf");
+  }]);
+
+
 /**
  * 由于整个应用都会和路由打交道，所以这里把$state和$stateParams这两个对象放到$rootScope上，方便其它地方引用和注入。
  * 这里的run方法只会在angular启动的时候运行一次。
@@ -61,7 +67,6 @@ app.run(function($rootScope, $state, $stateParams, $http, $timeout,httpService) 
 				 $rootScope.list = result.data;
 				 $rootScope.page = result.page;
 				 $rootScope.others=result.others;
-				 $rootScope.deleteIds = ",";
 			 }
 		}).error(function(result) {
 			lookUp('lookUp','',100,300,3);
@@ -84,7 +89,6 @@ app.run(function($rootScope, $state, $stateParams, $http, $timeout,httpService) 
 				 }else{
 					 $rootScope.model = result.data;
 					 $rootScope.error = null;
-					 $rootScope.deleteIds = ",";
 					 if(callBack)
 						 callBack();
 				 }
@@ -109,15 +113,12 @@ app.run(function($rootScope, $state, $stateParams, $http, $timeout,httpService) 
 	$rootScope.copyInterface = function() {
 		changeDisplay('copyInterFace','interFaceDetail');
 	};
-	$rootScope.changeDisplay = function(id1, id2) {
-		changeDisplay(id1,id2);
-	}
 	$rootScope.del = function(iUrl,id,title){
 		title = title? title:"确认要删除【"+id+"】？";
 		if (confirm(title)) {
-			var params = "iUrl="+iUrl+"|iLoading=TIP";
+			var params = "iUrl="+iUrl+"|iLoading=PROPUP";
 			httpService.callHttpMethod($http,params).success(function(result) {
-				var isSuccess = httpSuccess(result,'iLoading=TIP')
+				var isSuccess = httpSuccess(result,'iLoading=PROPUP')
 				if(!isJson(result)||isSuccess.indexOf('[ERROR]') >= 0){
 					 $rootScope.error = isSuccess.replace('[ERROR]', '');
 				 }else{
@@ -136,27 +137,7 @@ app.run(function($rootScope, $state, $stateParams, $http, $timeout,httpService) 
 			});;
 	    }
 	};
-	// 选中某个选项
-	$rootScope.checkboxSelect = function(checkValues,value){
-		if( $rootScope[checkValues].indexOf(","+value+",")>=0 ){
-			$rootScope[checkValues] = $rootScope[checkValues].replace(value+",","");
-		}else{
-			$rootScope[checkValues] = $rootScope[checkValues]+value+","
-		}
-	}
-	// 全选，不选
-	$rootScope.selectAll = function(id,name,list){
-		selectAll(id, name);
-		if($("#"+id).prop("checked")==true){ 
-			$rootScope[name] = ",";
-			for (var i=0;i<list.length;i++){
-				$rootScope[name] = $rootScope[name] + list[i].id + "," ;
-			}
-		}else{
-			$rootScope[name] = ",";
-		}
-	}
-	
+
 	$rootScope.submitForm = function(iurl,callBack,myLoading){
 		/**
 		  * 回调刷新当前页面数据
@@ -176,6 +157,9 @@ app.run(function($rootScope, $state, $stateParams, $http, $timeout,httpService) 
 			 }else if(result.success==1){
 				 $rootScope.error = null;
 				 $rootScope.model = result.data;
+				 if(iurl == 'user/article/dictionary/importFromSql.do'){
+					 $rootScope.model.isMysql = true;
+				 }
 				 //关闭编辑对话框
 				 closeMyDialog('myDialog');
 				 $timeout(function() {
@@ -316,26 +300,6 @@ app.run(function($rootScope, $state, $stateParams, $http, $timeout,httpService) 
 	}
 	 $rootScope.iClose = function(id) {
 	    	iClose(id);
-	 };
-	 /******静态化****************/
-	 $rootScope.staticize= function (id){
-			callAjaxByName('iUrl=user/staticize/staticize.do?projectId='+id+'|iLoading=TIPFLOAT静态化中，请稍后...|ishowMethod=updateDivWithImg|iFormId=staticize-form');
-	 }
-	 $rootScope.downloadStaticize= function (id){
-		 var params = "iUrl=user/staticize/downloadStaticize.do?projectId="+id+"|iLoading=TIPFLOAT静态化中，请稍后...|iPost=POST";
-			httpService.callHttpMethod($http,params).success(function(result) {
-				var isSuccess = httpSuccess(result,'iLoading=TIPFLOAT')
-				if(!isJson(result)||isSuccess.indexOf('[ERROR]') >= 0){
-					 $rootScope.error = isSuccess.replace('[ERROR]', '');
-				 }else if(result.success==1){
-					 $("#downloadUrl").html("操作成功，将自动下载，3s后若无反应，请点击：<a href='"+ result.data +"' target='_blank'>下载</a> 手动下载");
-					 window.open(result.data);
-				 }
-			}).error(function(result) {
-				lookUp('lookUp','',100,300,3);
-				closeTip('[ERROR]未知异常，请联系开发人员查看日志', 'iLoading=TIPFLOAT', 3);
-				$rootScope.error = result;
-			});
-	 }
+	    };
 });
 

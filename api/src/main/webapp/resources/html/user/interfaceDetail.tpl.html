@@ -24,7 +24,7 @@
 					    <div ng-class="{true: 'input-group w', false: 'w'}[model.moduleUrl!='']">
 					      <div class="input-group-addon" ng-bind="model.moduleUrl" ng-if="model.moduleUrl"></div>
 					      <input type="text" class="form-control" ng-model="model.url" required maxlength="200"
-						placeholder="示例：http://api.crap.cn/CustomerOrder/{id}">
+						placeholder="示例：?业务模块&业务方法 （?smsService&smsSend）">
 					    </div>
 					</td>
 				</tr>
@@ -55,8 +55,13 @@
 					<input  class="form-control" type="text" ng-model="model.monitorTypeName" id="monitorTypeName" required placeholder="点击选择"
 					ng-focus="loadPickByName('iwidth=220|iheight=320|tagName=monitorTypeName|tag=monitorType|code=MONITORTYPE|def='+model.monitorType,$event)">
 					</td>
-					<td class="tc"></td>
-					<td class="tc"></td>
+					<td class="tc">是否需要登录</td>
+					<td>
+						<select name="isLogin" class="form-control b0 no-b-s" ng-model="model.isLogin">
+							<option value="1" ng-selected="model.isLogin == 1">true</option>
+							<option value="0" ng-selected="model.isLogin == 0">false</option>
+						</select>
+					</td>
 				</tr>
 				<tr ng-if="model.monitorType>1">
 					<td class="tc">监控内容<br/>符合该条件则会发送邮件告警</td>
@@ -82,7 +87,7 @@
 				
 				<tr>
 					<td class="tc">
-						参数类型<br> 
+						请求参数类型<br> 
 						<input type="button" class="btn btn-default btn-sm w100 mt10 param-group iactive" value="表单模式" 
 						onclick="changeDisplay('formParam','customParam');selectButton(this,'param-group')">
 						<input type="button" class="btn btn-default btn-sm w100 mt10 param-group" value="自定义" 
@@ -101,7 +106,7 @@
 					<td class="tc" colspan="3">
 						<div class="input-group w none" id="paramImportDiv">
 								<textarea class="form-control no-resize" ng-model="model.importJson"
-									rows="5" placeholder="请输入需要导出的json数据"></textarea>
+									rows="5" placeholder="请输入需要导入的json数据"></textarea>
 								<div class="input-group-addon cursor btn-main"
 									ng-click="importParams('paramRemarks');">
 									导入</div>
@@ -111,7 +116,7 @@
 				</tr>
 				<tr>
 					<td class="tc">
-						返回参数
+						返回参数类型
 						<input type="button" class="btn btn-default btn-sm w100 mt10 resparam-group iactive" value="编辑模式" 
 						onclick="changeDisplay('responseEditorDiv','responseImportDiv');selectButton(this,'resparam-group')">
 						<input type="button" class="btn btn-default btn-sm w100 mt10 resparam-group" value="JSON导入" 
@@ -120,7 +125,7 @@
 					<td class="tc" colspan="3">
 						<div class="input-group w none" id="responseImportDiv">
 								<textarea class="form-control no-resize" ng-model="model.importJson"
-									rows="5" placeholder="请输入需要导出的json数据"></textarea>
+									rows="5" placeholder="请输入需要导入的json数据"></textarea>
 								<div class="input-group-addon cursor btn-main"
 									ng-click="importParams('responseParams');">
 									导入</div>

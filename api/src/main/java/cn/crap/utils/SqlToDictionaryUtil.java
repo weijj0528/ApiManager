@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
 import cn.crap.dto.DictionaryDto;
 import cn.crap.enumeration.ArticleType;
 import cn.crap.enumeration.DictionaryPropertyType;
 import cn.crap.framework.MyException;
 import cn.crap.model.Article;
-import net.sf.json.JSONArray;
 
 public class SqlToDictionaryUtil {
 	
@@ -19,8 +19,6 @@ public class SqlToDictionaryUtil {
 		if(!sql.toLowerCase().replaceAll(" ", "").startsWith("createtable")){
 			throw new MyException("000046");
 		}
-		// 联合主键等被切分
-		sql = sql.replace("`,`", "");
 		Article article = new Article();
 		article.setType(ArticleType.DICTIONARY.name());
 		article.setBrief(brief);
@@ -71,6 +69,9 @@ public class SqlToDictionaryUtil {
 						}else{
 							dto.setDef(def.trim().split(" ")[1].replace("'", ""));
 						}
+						if(dto.getDef().equals("")){
+							dto.setDef("Empty String");
+						}
 					}
 					if(field.toLowerCase().indexOf(" comment ") > 0){
 						String remark = field.substring(field.toLowerCase().indexOf(" comment "));
@@ -117,13 +118,7 @@ public class SqlToDictionaryUtil {
 		}
 		List<DictionaryDto> fieldList = new ArrayList<DictionaryDto>();
 		for(String key: propertys.keySet()){
-			if( propertys.get(key).getFlag().equals( DictionaryPropertyType.primary.getName() )
-					|| propertys.get(key).getFlag().equals( DictionaryPropertyType.foreign.getName() )
-					|| propertys.get(key).getFlag().equals( DictionaryPropertyType.associate.getName() ) ){
-				fieldList.add(0,propertys.get(key));
-			}else{
-				fieldList.add(propertys.get(key));
-			}
+			fieldList.add(propertys.get(key));
 		}
 		article.setContent(JSONArray.fromObject(fieldList).toString());
 		return article;
@@ -227,13 +222,7 @@ public class SqlToDictionaryUtil {
 		}
 		List<DictionaryDto> fieldList = new ArrayList<DictionaryDto>();
 		for(String key: propertys.keySet()){
-			if( propertys.get(key).getFlag().equals( DictionaryPropertyType.primary.getName() )
-					|| propertys.get(key).getFlag().equals( DictionaryPropertyType.foreign.getName() )
-					|| propertys.get(key).getFlag().equals( DictionaryPropertyType.associate.getName() ) ){
-				fieldList.add(0,propertys.get(key));
-			}else{
-				fieldList.add(propertys.get(key));
-			}
+			fieldList.add(propertys.get(key));
 		}
 		article.setContent(JSONArray.fromObject(fieldList).toString());
 		return article;

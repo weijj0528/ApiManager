@@ -1,20 +1,15 @@
 package cn.crap.framework.base;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -76,9 +71,9 @@ public abstract class BaseController<T extends BaseModel> {
 	 * spring 中request、response是线程安全的，可以直接注入
 	 * 
 	 * @ModelAttribute注解只有在被
-	 * @Controller和@ControllerAdvice两个注解的类下使用 ModelAttribute的作用 1)放置在方法的形参上：
-	 *                                        表示引用Model中的数据 2)放置在方法上面：
-	 *                                        表示请求该类的每个Action前都会首先执行它也可以将一些准备数据的操作放置在该方法里面。
+	 * @Controller和@ControllerAdvice两个注解的类下使用 ModelAttribute的作用
+	 *    1)放置在方法的形参上： 表示引用Model中的数据
+	 *    2)放置在方法上面：表示请求该类的每个Action前都会首先执行它也可以将一些准备数据的操作放置在该方法里面。
 	 * @param request
 	 * @param response
 	 */
@@ -93,7 +88,6 @@ public abstract class BaseController<T extends BaseModel> {
 	 */
 	protected HashMap<String, String> getRequestHeaders() {
 		HashMap<String, String> requestHeaders = new HashMap<String, String>();
-		@SuppressWarnings("unchecked")
 		Enumeration<String> headerNames = request.getHeaderNames();
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
@@ -108,7 +102,6 @@ public abstract class BaseController<T extends BaseModel> {
 	 */
 	protected HashMap<String, String> getRequestParams() {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		@SuppressWarnings("unchecked")
 		Enumeration<String> paramNames = request.getParameterNames();
 		while (paramNames.hasMoreElements()) {
 			String paramName = paramNames.nextElement();
@@ -123,32 +116,11 @@ public abstract class BaseController<T extends BaseModel> {
 	public JsonResult expHandler(HttpServletRequest request, Exception ex) {
 		if (ex instanceof MyException) {
 			return new JsonResult((MyException) ex);
-		}else if (ex instanceof NullPointerException) {
-			return new JsonResult(new MyException("000051"));
-		}else {
-			log.error(ex.getMessage(), ex);
-
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ex.printStackTrace(new PrintStream(baos));
-			String exceptionDetail[] = baos.toString().split("Caused by:");
-			try {
-				baos.close();
-			} catch (IOException e) {
-			}
-			
-			String cusedBy = "";
-			if (exceptionDetail.length > 0) {
-				cusedBy = exceptionDetail[exceptionDetail.length - 1].split("\n")[0];
-			}
-			
-			// 字段超过最大长度异常处理
-			if (ex instanceof DataIntegrityViolationException) {
-				if (cusedBy.contains("com.mysql.jdbc.MysqlDataTruncation")) {
-					return new JsonResult(new MyException("000052", "（字段：" + cusedBy.split("'")[1] + "）"));
-				}
-			}
-
-			return new JsonResult(new MyException("000001", ex.getMessage() + "——" + cusedBy));
+		} else {
+			ex.printStackTrace();
+			log.error(ex.getMessage());
+			ex.printStackTrace();
+			return new JsonResult(new MyException("000001", ex.getMessage()));
 		}
 	}
 
@@ -160,6 +132,7 @@ public abstract class BaseController<T extends BaseModel> {
 			out.write(message);
 			out.flush();
 			out.close();
+			return;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -194,11 +167,11 @@ public abstract class BaseController<T extends BaseModel> {
 				if (type == view) {
 					return;
 				}
-
-				if (pu.projectAuth()[type]) {
+				
+				if( pu.projectAuth()[type]){
 					return;
 				}
-
+				
 			}
 
 		}
@@ -244,7 +217,6 @@ public abstract class BaseController<T extends BaseModel> {
 
 	/**
 	 * 初次输入浏览密码是需要验证码，然后记录至缓存中，第二次访问若缓存中有密码，则不需要检查验证码是否争取
-	 * 
 	 * @param neddPassword
 	 * @param password
 	 * @param visitCode
@@ -272,9 +244,10 @@ public abstract class BaseController<T extends BaseModel> {
 		}
 	}
 
-	protected void isPrivateProject(String password, String visitCode, Project project) throws MyException {
+	protected void isPrivateProject(String password, String visitCode, Project project)
+			throws MyException {
 		// web项目为默认的公开项目
-		if (project.getId().equals(Const.WEB_MODULE)) {
+		if(project.getId().equals(Const.WEB_MODULE)){
 			return;
 		}
 		// 如果是私有项目，必须登录才能访问，公开项目需要查看是否需要密码
@@ -296,7 +269,7 @@ public abstract class BaseController<T extends BaseModel> {
 			// 项目成员
 			ProjectUser pu = user.getProjects().get(project.getId());
 			if (pu == null) {
-				throw new MyException("000042");
+					throw new MyException("000042");
 			}
 		} else {
 			String needPassword = project.getPassword();

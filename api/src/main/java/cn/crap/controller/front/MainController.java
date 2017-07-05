@@ -53,6 +53,7 @@ public class MainController extends BaseController<User> {
 	@RequestMapping("/home.do")
 	public void home() throws Exception {
 		response.sendRedirect("index.do");
+		return;
 	}
 	
 	/**
@@ -134,8 +135,6 @@ public class MainController extends BaseController<User> {
 			settingMap.put(setting.getKey(), setting.getValue());
 		}
 		settingMap.put(Const.DOMAIN, config.getDomain());
-		settingMap.put(Const.SETTING_OPEN_REGISTER, config.isOpenRegister()+"");
-		settingMap.put(Const.SETTING_GITHUB_ID, MyString.isEmpty( config.getClientID() )? "false":"true");
 		
 		Map<String,Object> returnMap = new HashMap<String,Object>();
 		returnMap.put("settingMap", settingMap);

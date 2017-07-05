@@ -39,11 +39,6 @@ public class ArticleService extends BaseService<Article>
 	public List<Article> getAll() {
 		return webPageDao.findByMap(null, null, null);
 	}
-
-	@Override
-	public String getLuceneType() {
-		return "文章&数据字典";
-	}
 	
 	
 	

@@ -26,7 +26,6 @@ import cn.crap.inter.service.tool.ISearchService;
 import cn.crap.model.Error;
 import cn.crap.model.Interface;
 import cn.crap.model.Module;
-import cn.crap.model.Project;
 import cn.crap.springbeans.Config;
 import cn.crap.utils.Const;
 import cn.crap.utils.DateFormartUtil;
@@ -182,20 +181,12 @@ public class InterfaceController extends BaseController<Interface>{
 		}
 		
 		if (!MyString.isEmpty(interFace.getId())) {
-			String oldModuleId = interfaceService.get(interFace.getId()).getModuleId();
-			String projectId = cacheService.getModule(oldModuleId).getProjectId();
-			Project project = cacheService.getProject( interFace.getProjectId() );
-			
-			// 接口只能在同一个项目下的模块中移动
-			if( !projectId.equals(project.getId())){
-				throw new MyException("000047");
-			}
+			interFace.setModuleId( interfaceService.get(interFace.getId()).getModuleId());
 			// 判断是否有修改模块的权限
-			hasPermission(project, modInter);
+			hasPermission(cacheService.getProject( interFace.getProjectId() ), modInter);
 			
 			//同一模块下不允许 url 重复
-			if( !config.isCanRepeatUrl() && interfaceService.getCount(Tools.getMap("moduleId",interFace.getModuleId(), "fullUrl",
-					interFace.getModuleUrl() +interFace.getUrl(),"id|!=",interFace.getId())) >0 ){
+			if( !config.isCanRepeatUrl() && interfaceService.getCount(Tools.getMap("moduleId",interFace.getModuleId(), "fullUrl",interFace.getModuleUrl() +interFace.getUrl(),"id|!=",interFace.getId())) >0 ){
 				throw new MyException("000004");
 			}
 			
@@ -220,23 +211,11 @@ public class InterfaceController extends BaseController<Interface>{
 
 	@RequestMapping("/delete.do")
 	@ResponseBody
-	public JsonResult delete(String id, String ids) throws MyException, IOException{
-		if( MyString.isEmpty(id) && MyString.isEmpty(ids)){
-			throw new MyException("000029");
-		}
-		if( MyString.isEmpty(ids) ){
-			ids = id;
-		}
-		
-		for(String tempId : ids.split(",")){
-			if(MyString.isEmpty(tempId)){
-				continue;
-			}
-			Interface interFace = interfaceService.get( tempId );
-			hasPermission(cacheService.getProject( interFace.getProjectId() ), delInter);
-			interfaceService.delete(interFace, "接口", "");
-			luceneService.delete(new SearchDto(interFace.getId()));
-		}
+	public JsonResult delete(@ModelAttribute Interface interFace) throws MyException, IOException {
+		interFace = interfaceService.get(interFace.getId());
+		hasPermission(cacheService.getProject( interFace.getProjectId() ), delInter);
+		interfaceService.delete(interFace, "接口", "");
+		luceneService.delete(new SearchDto(interFace.getId()));
 		return new JsonResult(1, null);
 	}
 

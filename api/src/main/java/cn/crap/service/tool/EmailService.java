@@ -18,7 +18,6 @@ import cn.crap.inter.service.tool.IEmailService;
 import cn.crap.springbeans.Config;
 import cn.crap.utils.Aes;
 import cn.crap.utils.Const;
-import cn.crap.utils.SerializeUtil;
 import cn.crap.utils.Tools;
 
 @Service

@@ -18,7 +18,6 @@ import cn.crap.framework.base.BaseModel;
 import cn.crap.inter.service.tool.ICacheService;
 import cn.crap.service.tool.CacheService;
 import cn.crap.utils.MyString;
-import cn.crap.utils.Tools;
 
 @Entity
 @Table(name = "interface")
@@ -31,6 +30,7 @@ public class Interface extends BaseModel implements Serializable,ILuceneDto{
 	private String url;
 	private String method;
 	private String param;
+	private int isLogin;// 是否需要登录
 	private String requestExam;
 	private String responseParam;
 	private String errorList;
@@ -84,7 +84,6 @@ public class Interface extends BaseModel implements Serializable,ILuceneDto{
 		dto.setUrl("#/"+getProjectId()+"/front/interfaceDetail/" + id);
 		dto.setVersion(version);
 		dto.setHref(getFullUrl());
-		dto.setProjectId(getProjectId());
 		// 私有项目不能建立索引
 		if(cacheService.getProject(getProjectId()).getType() == ProjectType.PRIVATE.getType()){
 			dto.setNeedCreateIndex(false);
@@ -129,6 +128,15 @@ public class Interface extends BaseModel implements Serializable,ILuceneDto{
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	@Column(name = "isLogin")
+	public int getIsLogin() {
+		return isLogin;
+	}
+
+	public void setIsLogin(int isLogin) {
+		this.isLogin = isLogin;
 	}
 
 	@Column(name = "method")
@@ -321,11 +329,6 @@ public class Interface extends BaseModel implements Serializable,ILuceneDto{
 		this.template = template;
 	}
 
-	@Transient 
-	public String getRemarkNoHtml(){
-		return Tools.subString( Tools.removeHtml(this.remark), 166, "...");
-	}
-	
 	@Transient
 	public String getProjectId() {
 		if (!MyString.isEmpty(moduleId)) {

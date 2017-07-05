@@ -72,7 +72,6 @@ public class Article extends BaseModel implements Serializable,ILuceneDto{
 		dto.setType(Article.class.getSimpleName());
 		dto.setUrl("#/"+getProjectId()+"/article/detail/"+getModuleId()+"/"+type+"/"+id);
 		dto.setVersion("");
-		dto.setProjectId(getProjectId());
 		// 私有项目不能建立索引
 		if(cacheService.getProject(getProjectId()).getType() == ProjectType.PRIVATE.getType()){
 			dto.setNeedCreateIndex(false);
@@ -209,10 +208,6 @@ public class Article extends BaseModel implements Serializable,ILuceneDto{
 	public void setMarkdown(String markdown) {
 		this.markdown = markdown;
 	}
-	@Transient
-	@Override
-	public String getLogRemark() {
-		return name;
-	}
+	
 	
 }

@@ -27,14 +27,53 @@
 					<tr>
 						<td>url</td>
 						<td>
-							<input type="text" class="form-control" ng-model="model.fullUrl" required placeholder="示例：http://api.crap.cn/CustomerOrder/{id}">
+							<input type="text" class="form-control" ng-model="model.fullUrl" 
+							required placeholder="示例：http://api.crap.cn/CustomerOrder/{id}">
 					    </td>
 					</tr>
 					<tr>
 						<td>请求方式</td>
 						<td>
-							<input class="form-control cursor" type="text" id="debugMethod" placeholder="请点击输入框选择" required ng-model="model.debugMethod"
-							ng-focus="loadPickByName('iwidth=220|iheight=250|showType=5|tag=debugMethod|code=REQUESTMETHOD|def='+model.debugMethod,$event)">
+							<input class="form-control cursor" type="text" id="debugMethod" placeholder="请点击输入框选择" 
+							required ng-model="model.debugMethod" 
+					ng-focus="loadPickByName('iwidth=220|iheight=250|showType=5|tag=debugMethod|code=REQUESTMETHOD|def='+model.debugMethod,$event)">
+						</td>
+					</tr>
+					<tr>
+						<td>请求验证方式</td>
+						<td>
+							<table class="table tableInupt" id="debugIsLogin">
+								<tbody>
+									<tr class="lh20">
+										<td class="tc fb C000" >登录验证：</td>
+										<td class="tc C000 w250" >	
+											<select name="isLogin" disabled="disabled" ng-if="model.isLogin !=null && model.isLogin == 1" 
+											 class="form-control b0 no-b-s" ng-model="model.isLogin">
+												<option value="1" ng-selected="model.isLogin == 1">必须登录访问</option>
+												<option value="0" ng-selected="model.isLogin == 0">非登陆访问</option>
+											</select>
+											<select name="isLogin"  ng-if="model.isLogin == null || model.isLogin == 0" 
+											 class="form-control b0 no-b-s" ng-model="model.isLogin">
+												<option value="1" ng-selected="model.isLogin == 1">必须登录访问</option>
+												<option value="0" ng-selected="model.isLogin == 0">非登录访问</option>
+											</select>
+										</td>
+									</tr>
+									<tr class="lh20">
+										<td class="tc fb C000">手机号码：</td>
+										<td class="tc C000 w250">
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="phone" value="18505565316">
+										</td>
+									</tr>
+									<tr class="lh20">
+										<td class="tc fb C000">登录密码：</td>
+										<td class="tc C000 w250">
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="password" value="123456">
+										</td>
+									</tr>
+								</tbody>
+							</table>						
+							
 						</td>
 					</tr>
 					<tr ng-if="headers!=null&& headers.length>0">
@@ -54,7 +93,8 @@
 									<tr class="lh20" ng-repeat="item in headers">
 										<td class="tc fb C000">{{item.name}}</td>
 										<td class="tc C000 w250">
-											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="{{item.name}}" value="{{item.def}}">
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="{{item.name}}"
+											 value="{{item.def}}">
 											<span ng-if="item.necessary=='true'" class="w50 fb text-danger">*</span>
 										</td>
 										<td class="tc C000">{{item.type}}</td>
@@ -71,22 +111,50 @@
 							<table class="table tableInupt" id="debugParams">
 								<thead>
 									<tr class="BGEEE C000">
-										<th class="tc w200">名称</th>
+										<th class="tc"></th>
+										<th class="tc w100">父别</th>
+										<th class="tc w100">名称</th>
 										<th class="tc">值</th>
-										<th class="tc">类型</th>
+										<th class="tc w120">类型</th>
 										
-										<th class="tc w150">备注</th>
+										<th class="tc w300">备注</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr class="lh20" ng-repeat="item in formParams">
+										<td class="tc fb">{{item.deep}}<input type="hidden" name="deep" value="{{item.deep}}" ng-model="item.deep">
+										</td>
+										<td class="tc fb" style="color: red;" >{{item.parentName}}
+										<input type="hidden" name="parentName" value="{{item.parentName}}" ng-model="item.parentName"></td>
 										<td class="tc fb C000">{{item.name}}</td>
 										<td class="tc C000 w250">
-											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="{{item.name}}" value="{{item.def}}">
+											<input disabled="disabled" class="form-control btn-xs dis-in-tab w200 fl" type="text" name="{{item.name}}"
+											value="{{item.def}}" 
+											ng-if="item.type=='object' || item.type=='array[object]' || item.type=='array' ">
+											
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="{{item.name}}" value="{{item.def}}"
+											ng-if="(item.type!='object' && item.type!='array[object]' && item.type!='array') || item.def > 0 ">
+											
 											<span ng-if="item.necessary=='true'" class="w50 fb text-danger">*</span>
 										</td>
-										<td class="tc C000">{{item.type}}</td>
-										
+										<td class="tc C000">
+											<select name="type" class="form-control b0 no-b-s" ng-model="item.type" disabled="disabled">
+												<option value="string" ng-selected="item.type=='string'">string</option>
+												<option value="int" ng-selected="item.type=='int'">int</option>
+												<option value="float" ng-selected="item.type=='float'">float</option>
+												<option value="long" ng-selected="item.type=='long'">long</option>
+												<option value="byte" ng-selected="item.type=='byte'">byte</option>
+												<option value="double" ng-selected="item.type=='double'">double</option>
+												<option value="boolean" ng-selected="item.type=='boolean'">boolean</option>
+												<option value="object" ng-selected="item.type=='object'">object</option>
+												<option value="array" ng-selected="item.type=='array'">array</option>
+												<option value="array[number]" ng-selected="item.type=='array[number]'">array[number]</option>
+												<option value="array[boolean]" ng-selected="item.type=='array[boolean]'">array[boolean]</option>
+												<option value="array[string]" ng-selected="item.type=='array[string]'">array[string]</option>
+												<option value="array[object]" ng-selected="item.type=='array[object]'">array[object]</option>
+												<option value="file" ng-selected="item.type=='file'">file</option>
+											</select>
+										</td>										
 										<td class="tc C000">{{item.remark}}</td>
 									</tr>
 								</tbody>
@@ -109,10 +177,9 @@
 				
 			</form>
 			<div class="code" ng-if="model.debugResult">
+			<button ng-click ="showInfo()" clip-copy="model.debugResult">copy</button>
 				<pre>{{model.debugResult}}</pre>
 			</div>
-			
-		
 </div>
 </div>
 <div class="cb"></div>

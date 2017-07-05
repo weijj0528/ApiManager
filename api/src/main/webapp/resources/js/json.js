@@ -64,7 +64,7 @@ function jsonToDiv(txt) {/* 格式化JSON源码(对象转换为JSON文本) */
 	;
 	var draw = [], line = ',', nodeCount = 0;
 
-	var notify = function(name, value, indent) {
+	var notify = function(name, value, indent,parentName) {
 		nodeCount++;/*节点计数*/
 		
 		for (var i = 0, tab = ''; i < indent; i++)
@@ -83,14 +83,14 @@ function jsonToDiv(txt) {/* 格式化JSON源码(对象转换为JSON文本) */
 				}else if (typeof value == 'boolean') {
 					type = 'boolean';
 				}
-				if( name != ''){
-					draw.push('{"deep":"'+tab.length+'","name":"'+name+'","remark":"","type":"array['+type+']","necessary":"true"}' + line);
+				if( name != '' && parentName != ''  ){
+					draw.push('{"deep":"'+tab.length+'","parentName":"'+parentName+'","name":"'+name+'","remark":"","type":"array['+type+']","necessary":"true"}' + line);
 				}else{
-					indent = indent -1;
+					indent = indent -1;// 名称为空，无需缩进
 				}
 				
 				// 数组只需要记录第一个就行
-				notify("", value[0], indent);
+				notify("", value[0], indent,name);
 			}
 			
 		} else if (value && typeof value == 'object') {/*处理对象*/
@@ -98,13 +98,16 @@ function jsonToDiv(txt) {/* 格式化JSON源码(对象转换为JSON文本) */
 			// 数组中的元素，没有名称
 			if( name != ''){
 				// 将对象名放入队列
-				draw.push('{"deep":"'+tab.length+'","name":"'+name+'","remark":"","type":"object","necessary":"true"}' + line);
+				draw.push('{"deep":"'+tab.length+'","parentName":"'+parentName+'","name":"'+name+'","remark":"","type":"object","necessary":"true"}' + line);
+			}else if(parentName!=''){
+				indent = indent -1;// 名称为空，无需缩进
+				name=parentName;
 			}else{
 				indent = indent -1;// 名称为空，无需缩进
 			}
 			
 			for ( var key in value)
-				notify(key, value[key], indent);
+				notify(key, value[key], indent,name);
 			
 		} else {
 			var type;
@@ -119,14 +122,14 @@ function jsonToDiv(txt) {/* 格式化JSON源码(对象转换为JSON文本) */
 			}
 			
 			if(name != ""){// 数组中的字符等没有名称
-				draw.push('{"deep":"'+tab.length+'","name":"'+name+'","remark":"","type":"'+type+'","necessary":"true"}' + line);
+				draw.push('{"deep":"'+tab.length+'","parentName":"'+parentName+'","name":"'+name+'","remark":"","type":"'+type+'","necessary":"true"}' + line);
 			}
 		}
 		;
 	};
 	
 	var indent = 0;
-	notify('', data, indent);
+	notify('', data, indent,'');
 	var result = draw.join('');
 	if(result.length > 0){
 		result = result.substring(0,result.length-1);

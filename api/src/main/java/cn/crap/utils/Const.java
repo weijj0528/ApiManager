@@ -15,7 +15,6 @@ public class Const {
 	public final static String NULL_ID = "NULL"; //当新增数据时，前段传递的id=NULL
 	public static final String NOT_NULL = "NOT_NULL";
 	public static final String BLANK = "_BLANK"; 
-	public static final String ALL = "_ALL"; 
 	public static final String DEF_MODULEID = "defaultModuleId";
 	public static final String SUPER = "super"; 
 	public static final String MODULEID = "MODULEID"; 
@@ -83,8 +82,6 @@ public class Const {
 	public static final String SETTING_COMMENTCODE = "COMMENTCODE";
 	public static final String SETTING_LUCENE_DIR = "LUCENE_DIR";
 	public static final String SETTING_TITLE = "TITLE";
-	public static final String SETTING_OPEN_REGISTER = "openRegister";
-	public static final String SETTING_GITHUB_ID = "githubClientID";
 	
 	//SOLR
 	public static final String SOLR_URL = "SOLR_URL";

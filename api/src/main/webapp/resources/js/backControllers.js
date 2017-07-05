@@ -29,7 +29,6 @@ mainModule.filter('cut', function () {
 
 mainModule.controller('detailCtrl', function($scope, $http, $state, $stateParams,httpService) {});
 
-
 /***
  * 后台初始化，加载系统设置，菜单等
  */
@@ -132,7 +131,7 @@ mainModule.controller('backInit', function($rootScope,$scope, $http, $state, $st
     $scope.getData();
 });
 /**************************后端接口列表****************************/
-mainModule.controller('preLoginCtrl', function($rootScope,$scope, $http, $state, $stateParams,$timeout,httpService) {
+mainModule.controller('preLoginCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function() {
 		if($rootScope.model && $rootScope.model.sessionAdminName){
 			window.location.href="admin.do";
@@ -146,15 +145,6 @@ mainModule.controller('preLoginCtrl', function($rootScope,$scope, $http, $state,
 					alert(isSuccess.replace('[ERROR]', ''));
 				 }else{
 					 $rootScope.model = result.data.model;
-					 if( $rootScope.model.remberPwd != 'NO'){
-						 $timeout(function() {
-							 $("#remberPwdYes").click();
-		                 })
-					 }else{
-						 $timeout(function() {
-							 $("#remberPwdNo").click();
-		                 })
-					 }
 					 // 已经登陆成功，跳转至后台主页
 					 if($rootScope.model && $rootScope.model.sessionAdminName){
 							window.location.href="admin.do";
@@ -167,32 +157,6 @@ mainModule.controller('preLoginCtrl', function($rootScope,$scope, $http, $state,
     $scope.changeRadio = function(value){
     	$rootScope.model.remberPwd = value;
     }
-
-    $scope.login = function(iurl,myLoading){
-		var iLoading = "TIPFLOAT";
-		if(myLoading){
-			iLoading = myLoading;
-		}
-		var params = "iUrl="+iurl+"|iLoading="+iLoading+"|iPost=POST|iParams=&"+ $('#loginForm').serialize();
-		httpService.callHttpMethod($http,params).success(function(result) {
-			var isSuccess = httpSuccess(result,'iLoading='+iLoading);
-			if(!isJson(result)||isSuccess.indexOf('[ERROR]') >= 0){
-				 $rootScope.error = isSuccess.replace('[ERROR]', '');
-			 }else if(result.success==1){
-				 $rootScope.error = null;
-				 $rootScope.model = result.data;
-				 //关闭编辑对话框
-				 closeMyDialog('myDialog');
-				 $timeout(function() {
-					 $("#refresh").click();
-                 })
-			 }
-		}).error(function(result) {
-			closeTip('[ERROR]未知异常，请联系开发人员查看日志', 'iLoading='+iLoading, 3);
-			$rootScope.error = result;
-			 
-		});
-	}
     $scope.getData();
 });
 
@@ -238,8 +202,7 @@ mainModule.controller('menuCtrl', function($rootScope,$scope, $http, $state, $st
 /**************************用户列表****************************/
 mainModule.controller('userCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=user/list.do|iLoading=FLOAT|iPost=true|iParams=&trueName=" 
-			+ $stateParams.trueName + "&userName=" + $stateParams.userName + "&email=" + $stateParams.email;
+		var params = "iUrl=user/list.do|iLoading=FLOAT|iParams=&trueName=" + $("#trueName").val();
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -257,7 +220,7 @@ mainModule.controller('userArticleCtrl', function($rootScope,$scope, $http, $sta
 	$scope.getData = function(page) {
 		var params = "iUrl=user/article/list.do|iLoading=FLOAT|iPost=POST|iParams=&type=" 
 			+ $stateParams.type+"&moduleId="+$stateParams.moduleId+
-			"&category="+$("#searchCategory").val()+"&name="+$stateParams.name;
+			"&category="+$("#category").val()+"&name="+$stateParams.name;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -280,7 +243,7 @@ mainModule.controller('propertyCtrl', function($rootScope,$scope, $http, $state,
 /**************************系统设置列表****************************/
 mainModule.controller('settingCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=setting/list.do|iLoading=FLOAT|iPost=true|iParams=&remark=" + $("#searchRemark").val()+"&key="+$stateParams.key;
+		var params = "iUrl=setting/list.do|iLoading=FLOAT|iParams=&remark=" + $("#searchRemark").val()+"&key="+$stateParams.key;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -304,7 +267,7 @@ mainModule.controller('settingDetailCtrl', function($rootScope,$scope, $http, $s
 /**************************角色列表****************************/
 mainModule.controller('roleCtrl', function($rootScope,$scope, $http, $state, $stateParams ,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=role/list.do|iLoading=FLOAT|iPost=true|iParams=&roleName=" + $("#roleName").val();;
+		var params = "iUrl=role/list.do|iLoading=FLOAT|iParams=&roleName=" + $("#roleName").val();;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -312,7 +275,7 @@ mainModule.controller('roleCtrl', function($rootScope,$scope, $http, $state, $st
 
 mainModule.controller('sourceCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=user/source/list.do|iLoading=FLOAT|iPost=true|iParams=&name="+$stateParams.name+"&moduleId="+$stateParams.moduleId;
+		var params = "iUrl=user/source/list.do|iLoading=FLOAT|iParams=&name="+$stateParams.name+"&moduleId="+$stateParams.moduleId;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -421,6 +384,8 @@ mainModule.controller('backInterfaceDetailCtrl', function($rootScope,$scope, $ht
     	var newObj=new Object();
     	newObj.type="string";
     	newObj.necessary="true";
+    	
+    	if($rootScope.model[field]&&typeof($rootScope.model[field][parentIndex]) =='object'&&$rootScope.model[field][parentIndex].name)newObj.parentName=$rootScope.model[field][parentIndex].name;
     	if(parentIndex || parentIndex==0){
     		// 兼容历史数据
         	if(!deep){
@@ -434,22 +399,55 @@ mainModule.controller('backInterfaceDetailCtrl', function($rootScope,$scope, $ht
     		$rootScope.model[field][$rootScope.model[field].length]=newObj;
     	}
     }
-    
-    $scope.deleteOneParamByParent = function(field,parentIndex,deep){
+    $scope.deleteOneParamByForm = function(parentIndex,deep){
     	// 兼容历史数据
     	if(!deep){
     		deep = 0;
-    		$rootScope.model[field][parentIndex].deep=0;
+    		$rootScope.model.params[parentIndex].deep=0;
     	}
     	var needDelete = 1;
-    	for(var i=parentIndex+1; i<$rootScope.model[field].length; i++){
-    		if($rootScope.model[field][i].deep>deep){
+    	for(var i=parentIndex+1; i<$rootScope.model.params.length; i++){
+    		if($rootScope.model.params[i].deep>deep){
     			needDelete ++;
     		}else{
     			break;
     		}
     	}
-    	$rootScope.model[field].splice(parentIndex, needDelete);
+    	$rootScope.model.params.splice(parentIndex, needDelete);
+    }
+    
+    $scope.deleteOneParamByParent = function(parentIndex,deep){
+    	// 兼容历史数据
+    	if(!deep){
+    		deep = 0;
+    		$rootScope.model.responseParams[parentIndex].deep=0;
+    	}
+    	var needDelete = 1;
+    	for(var i=parentIndex+1; i<$rootScope.model.responseParams.length; i++){
+    		if($rootScope.model.responseParams[i].deep>deep){
+    			needDelete ++;
+    		}else{
+    			break;
+    		}
+    	}
+    	$rootScope.model.responseParams.splice(parentIndex, needDelete);
+    }
+    
+    $scope.deleteOneParamRemarksByParent = function(parentIndex,deep){
+    	// 兼容历史数据
+    	if(!deep){
+    		deep = 0;
+    		$rootScope.model.paramRemarks[parentIndex].deep=0;
+    	}
+    	var needDelete = 1;
+    	for(var i=parentIndex+1; i<$rootScope.model.paramRemarks.length; i++){
+    		if($rootScope.model.paramRemarks[i].deep>deep){
+    			needDelete ++;
+    		}else{
+    			break;
+    		}
+    	}
+    	$rootScope.model.paramRemarks.splice(parentIndex, needDelete);
     }
     $scope.importParams = function(field){
     	var jsonText = jsonToDiv($rootScope.model.importJson);
@@ -469,7 +467,7 @@ mainModule.controller('backInterfaceDetailCtrl', function($rootScope,$scope, $ht
 /**************************日志列表****************************/
 mainModule.controller('logCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=log/list.do|iLoading=FLOAT|iPost=true|iParams=&modelName="+$stateParams.modelName+"&identy="+$stateParams.identy;
+		var params = "iUrl=log/list.do|iLoading=FLOAT|iParams=&modelName="+$stateParams.modelName;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -477,12 +475,9 @@ mainModule.controller('logCtrl', function($rootScope,$scope, $http, $state, $sta
 /*************************项目列表************************/
 mainModule.controller('userProjectListCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=user/project/list.do|iLoading=FLOAT|iPost=true|iParams=&name="+$stateParams.name+"&type="+$stateParams.type+"&myself="+$stateParams.myself;
+		var params = "iUrl=user/project/list.do|iLoading=FLOAT|iParams=&name="+$stateParams.name+"&type="+$stateParams.type+"&myself="+$stateParams.myself;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
-    $scope.clearDonwloadUrl = function(){
-    	$("#downloadUrl").html("");
-    }
     $scope.getData();
 });
 /*************************模块列表**********************/
@@ -504,7 +499,7 @@ mainModule.controller('userInterfaceCtrl', function($rootScope,$scope, $http, $s
 			params += "&url=" + $("#url").val();
 		}
 		params +="&moduleId="+ $stateParams.moduleId;
-		params = "iUrl=user/interface/list.do|iLoading=FLOAT|iPost=true|iParams="+params;
+		params = "iUrl=user/interface/list.do|iLoading=FLOAT|iParams="+params;
 		$rootScope.getBaseData($scope,$http,params,page);
     };
     $scope.getData();
@@ -512,7 +507,7 @@ mainModule.controller('userInterfaceCtrl', function($rootScope,$scope, $http, $s
 /**************************错误码列表****************************/
 mainModule.controller('userErrorCtrl', function($rootScope,$scope, $http, $state, $stateParams,httpService) {
 	$scope.getData = function(page) {
-		var params = "iUrl=user/error/list.do|iLoading=FLOAT|iPost=true|iParams=";
+		var params = "iUrl=user/error/list.do|iLoading=FLOAT|iParams=";
 		params += "&projectId=" + $stateParams.projectId;
 		params += "&errorMsg=" + $stateParams.errorMsg;
 		params += "&errorCode=" + $stateParams.errorCode;
