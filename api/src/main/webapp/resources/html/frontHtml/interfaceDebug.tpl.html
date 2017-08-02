@@ -45,8 +45,8 @@
 							<table class="table tableInupt" id="debugIsLogin">
 								<tbody>
 									<tr class="lh20">
-										<td class="tc fb C000" >登录验证：</td>
-										<td class="tc C000 w250" >	
+										<td class="tc fb C000 w200" >登录验证：</td>
+										<td class="tc C000 w200" >
 											<select name="isLogin" disabled="disabled" ng-if="model.isLogin !=null && model.isLogin == 1" 
 											 class="form-control b0 no-b-s" ng-model="model.isLogin">
 												<option value="1" ng-selected="model.isLogin == 1">必须登录访问</option>
@@ -58,17 +58,32 @@
 												<option value="0" ng-selected="model.isLogin == 0">非登录访问</option>
 											</select>
 										</td>
-									</tr>
-									<tr class="lh20">
-										<td class="tc fb C000">手机号码：</td>
-										<td class="tc C000 w250">
-											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="phone" value="18505565316">
+										<td class="tc fb C000 w200" >登录方式：</td>
+										<td class="tc C000 w200" >
+											<select name="loginType" class="form-control b0 no-b-s" ng-model="model.loginType">
+												<option value="0" ng-selected="model.loginType == 0">APP登录</option>
+												<option value="1" ng-selected="model.loginType == 1">ERP登录</option>
+											</select>
 										</td>
 									</tr>
 									<tr class="lh20">
-										<td class="tc fb C000">登录密码：</td>
-										<td class="tc C000 w250">
+										<td class="tc fb C000 w200">APP账号：</td>
+										<td class="tc C000 w200">
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="phone" value="18505565316">
+										</td>
+										<td class="tc fb C000 w200">APP密码：</td>
+										<td class="tc C000 w200">
 											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="password" value="123456">
+										</td>
+									</tr>
+									<tr class="lh20">
+										<td class="tc fb C000 w200">ERP账号：</td>
+										<td class="tc C000 w200">
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="no" value="admin">
+										</td>
+										<td class="tc fb C000 w200">ERP密码：</td>
+										<td class="tc C000 w200">
+											<input class="form-control btn-xs dis-in-tab w200 fl" type="text" name="pwd" value="123456">
 										</td>
 									</tr>
 								</tbody>
