@@ -110,12 +110,12 @@ public class HttpPostGet {
 	}
 	
 	public static String post(String path, Map<String, Object> params, Map<String, Object> headers,String debugIsLogin) throws Exception {
-		if(path.contains("/handle/control.do")){
+		if(path.contains("/handle/request")){
 			JSONObject fromObject = JSONObject.fromObject(params);
 			JSONObject demoTest = HttpTest.demoTest(path, fromObject, debugIsLogin);
 			return demoTest.optInt("status") != 200 ? "调试接口出错："+demoTest.optInt("status") : demoTest.optJSONObject("result").toString();
 		}
-		if(path.contains("/front/account")){
+		if(path.contains("/front/user")){
 			JSONObject fromObject = JSONObject.fromObject(params);
 			JSONObject demoTest = HttpTest.demoTestLogin(path, fromObject);
 			return demoTest.optInt("status") != 200 ? "调试接口出错："+demoTest.optInt("status") : demoTest.optJSONObject("result").toString();

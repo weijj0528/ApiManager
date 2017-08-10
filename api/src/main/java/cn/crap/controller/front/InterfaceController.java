@@ -225,7 +225,7 @@ public class InterfaceController extends BaseController<Interface>{
 	public JsonResult debug(@RequestParam String params, @RequestParam String headers,@RequestParam String debugIsLogin,
 			@RequestParam(defaultValue="") String customParams,
 			@RequestParam String debugMethod,@RequestParam String fullUrl) throws Exception {
-		JSONArray jsonParams = JSONArray.fromObject(params);
+        JSONArray jsonParams = JSONArray.fromObject(params);
 		JSONArray jsonHeaders = JSONArray.fromObject(headers);
 		Map<String,Object> httpParams = new HashMap<String,Object>();
 		for(int i=0;i<jsonParams.size();i++){
