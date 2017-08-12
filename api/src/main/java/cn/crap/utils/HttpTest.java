@@ -31,9 +31,9 @@ public class HttpTest {
             if (httpPostJson.optInt("status") != 200 || !result.optString("code").equals("1c01")) {
                 return httpPostJson;
             }
-            url = url.replace(substring, "") + ";jsessionid=" + result.getJSONObject("biz_result").getString("SID");
-            sign = SecretUtils.HmacSHA1Encrypt("biz_module=" + param[0] + "&biz_method=" + param[1] + "&time=" + time,
-                    result.getJSONObject("biz_result").getString("KEY"));
+            url = url.replace(substring, "") + ";jsessionid=" + result.getJSONObject("result").getString("SID");
+            sign = SecretUtils.HmacSHA1Encrypt("module=" + param[0] + "&method=" + param[1] + "&time=" + time,
+                    result.getJSONObject("result").getString("KEY"));
         }
         json.put("time", time);
         json.put("sign", sign);
