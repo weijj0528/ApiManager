@@ -5,7 +5,7 @@ import net.sf.json.JSONObject;
 
 
 public class HttpTest {
-    public static JSONObject demoTest(String url, JSONObject biz_param, String debugIsLogin) throws Exception {
+    public static JSONObject demoTest(String url, Object biz_param, String debugIsLogin) throws Exception {
         long time = System.currentTimeMillis();
         String substring = url.substring(url.indexOf("?"));
         String[] param = substring.replace("?", "").split("&");

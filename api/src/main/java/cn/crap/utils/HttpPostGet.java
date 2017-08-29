@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.http.Header;
@@ -215,8 +216,13 @@ public class HttpPostGet {
 	
 
 	public static String postBody(String url, String body, Map<String, Object> headers,String debugIsLogin) throws Exception {
-		if(url.contains("/handle/control.do")){
-			JSONObject fromObject = JSONObject.fromObject(body);
+		if(url.contains("/handle/request")){
+			Object fromObject = body;
+			if(body.startsWith("{")){
+				fromObject = JSONObject.fromObject(body);
+			}else if(body.startsWith("[")){
+				fromObject = JSONArray.fromObject(body);
+			}
 			JSONObject demoTest = HttpTest.demoTest(url, fromObject, debugIsLogin);
 			return demoTest.optInt("status") != 200 ? "调试接口出错："+demoTest.optInt("status") : demoTest.optString("result");
 		}
